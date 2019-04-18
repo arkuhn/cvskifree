@@ -1,0 +1,13 @@
+leapgestrecog/
+
+data/test/left/
+data/test/right/
+
+data/train/right/
+data/train/left/
+
+data/val/right/
+data/val/left/
+*.jpg
+*.h5
+*.png
