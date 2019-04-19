@@ -46,58 +46,68 @@ def increaseDifficulty():
     pass
 
 dist = 20
+start = False
+start_ticks=pygame.time.get_ticks()
 while 1:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-        if player.state == 'alive':
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT or event.key == ord('a'):
-                    player.rect.x -= dist
-                    print('left')
-                if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                    player.rect.x += dist
-                    print('right')
-
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == ord('a'):
-                    print('left stop')
-                if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                    print('right stop')
-                if event.key == ord('q'):
-                    pygame.quit()
-                    sys.exit()
-                    main = False 
-
-
-    increaseDifficulty()
-
-    addMoreEntities()
-
-    if (player.state == 'dead'):
-        titletext = myfont.render("GAME OVER", 1, (0,0,0))
-        screen.blit(titletext, (320, 240))
-        scoretext = myfont.render("Score = "+str(score), 1, (0,0,0))
-        screen.blit(scoretext, (320, 220))
-        for entity in entity_list.sprites():
-            entity.speed = 0
-            entity.speedModifier = 0
+    if not start:
+        seconds=(pygame.time.get_ticks()-start_ticks)/1000 #calculate how many seconds
+        if int(seconds) < 6:
+            counter = myfont.render("Starting in: " + str(5 - int(seconds)), 1, (0,0,0))
+            screen.blit(counter, (320, 240))
+        else:
+            start = True
     else:
-        score += 1
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            if player.state == 'alive':
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT or event.key == ord('a'):
+                        player.rect.x -= dist
+                        print('left')
+                    if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                        player.rect.x += dist
+                        print('right')
+
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key == ord('a'):
+                        print('left stop')
+                    if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                        print('right stop')
+                    if event.key == ord('q'):
+                        pygame.quit()
+                        sys.exit()
+                        main = False 
 
 
-    entity_list.update()
-    entity_list.draw(screen)
-       
-    wall_list.update()
-    wall_list.draw(screen)
+        increaseDifficulty()
 
-    player.check_collision(entity_list)
-    player.update()
-    player.draw(screen)
+        addMoreEntities()
 
-    scoretext = myfont.render("Score = "+str(score), 1, (0,0,0))
-    screen.blit(scoretext, (10, 10))
-    
+        if (player.state == 'dead'):
+            titletext = myfont.render("GAME OVER", 1, (0,0,0))
+            screen.blit(titletext, (320, 240))
+            scoretext = myfont.render("Score = "+str(score), 1, (0,0,0))
+            screen.blit(scoretext, (320, 220))
+            for entity in entity_list.sprites():
+                entity.speed = 0
+                entity.speedModifier = 0
+        else:
+            score += 1
+
+
+        entity_list.update()
+        entity_list.draw(screen)
+        
+        wall_list.update()
+        wall_list.draw(screen)
+
+        player.check_collision(entity_list)
+        player.update()
+        player.draw(screen)
+
+        scoretext = myfont.render("Score = "+str(score), 1, (0,0,0))
+        screen.blit(scoretext, (10, 10))
+        
 
     pygame.display.flip()
     screen.fill([255, 255, 255])
