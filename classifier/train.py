@@ -1,9 +1,10 @@
 
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Conv2D, MaxPooling2D, MaxPool2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, Callback
+from keras import optimizers
 from skimage import exposure
 import numpy as np
 from matplotlib import pyplot as plt
@@ -35,20 +36,21 @@ class PlotLearning(Callback):
         self.acc.append(logs.get('acc'))
         self.val_acc.append(logs.get('val_acc'))
         self.i += 1
-        f, (ax1, ax2) = plt.subplots(1, 2, sharex=True)
-        
-        clear_output(wait=True)
-        
-        ax1.set_yscale('log')
-        ax1.plot(self.x, self.losses, label="loss")
-        ax1.plot(self.x, self.val_losses, label="val_loss")
-        ax1.legend()
-        
-        ax2.plot(self.x, self.acc, label="accuracy")
-        ax2.plot(self.x, self.val_acc, label="validation accuracy")
-        ax2.legend()
-        
-        plt.show();
+        if (epoch % 10 == 0):
+            f, (ax1, ax2) = plt.subplots(1, 2, sharex=True)
+            
+            clear_output(wait=True)
+            
+            ax1.set_yscale('log')
+            ax1.plot(self.x, self.losses, label="loss")
+            ax1.plot(self.x, self.val_losses, label="val_loss")
+            ax1.legend()
+            
+            ax2.plot(self.x, self.acc, label="accuracy")
+            ax2.plot(self.x, self.val_acc, label="validation accuracy")
+            ax2.legend()
+            
+            plt.show();
         
 plot = PlotLearning()
 
@@ -60,35 +62,36 @@ val_data_dir = './data/val/'
 
 
 model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=(image_width, image_height, 1)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
 
-model.add(Conv2D(32, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(filters = 32, kernel_size = (5,5),padding = 'Same', 
+                 activation ='relu', input_shape = (image_width,image_height,1)))
+model.add(Conv2D(filters = 32, kernel_size = (5,5),padding = 'Same', 
+                 activation ='relu'))
+model.add(MaxPool2D(pool_size=(2,2)))
+model.add(Dropout(0.25))
 
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
+
+model.add(Conv2D(filters = 64, kernel_size = (3,3),padding = 'Same', 
+                 activation ='relu'))
+model.add(Conv2D(filters = 64, kernel_size = (3,3),padding = 'Same', 
+                 activation ='relu'))
+model.add(MaxPool2D(pool_size=(2,2), strides=(2,2)))
+model.add(Dropout(0.25))
+
 
 model.add(Flatten())
-model.add(Dense(64))
-model.add(Activation('relu'))
-model.add(Dropout(0.6))
-model.add(Dense(1))
-model.add(Activation('sigmoid'))
+model.add(Dense(256, activation = "relu"))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation = "sigmoid"))
 
+adam = optimizers.Adam(lr=0.00009, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
 model.compile(loss='binary_crossentropy',
-            optimizer='adam',
+            optimizer=adam,
             metrics=['accuracy'])
 
 #Train and val data augmentors
 train_datagen = ImageDataGenerator (
     rescale=1./255,
-    rotation_range=3,
-    width_shift_range=.1, 
-    height_shift_range=.1,
     fill_mode='nearest'
 )
 val_datagen = ImageDataGenerator(
@@ -116,8 +119,9 @@ val_generator = val_datagen.flow_from_directory(
 
 model.fit_generator(
     train_generator,
-    epochs=50,
+    epochs=150,
     shuffle=True,
     callbacks=callbacks_list,
     validation_data=val_generator,
 )
+

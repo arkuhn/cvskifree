@@ -3,7 +3,7 @@ from player import Player
 from wall import Wall
 from entity import Entity
 from pygame.locals import *
-
+import time
 
 
 
@@ -36,7 +36,7 @@ wall_list.add(wall)
 player = Player(325, 245, wall_list)
 
 score = 0
-dist = 10
+dist = 15
 start = False
 start_ticks=pygame.time.get_ticks()
 
@@ -57,6 +57,7 @@ while 1:
         seconds=(pygame.time.get_ticks()-start_ticks)/1000 #calculate how many seconds
         if int(seconds) < 9:
             counter = myfont.render("Starting in: " + str(10 - int(seconds)), 1, (0,0,0))
+            time.sleep(0.5)
             screen.blit(counter, (320, 240))
         else:
             start = True
