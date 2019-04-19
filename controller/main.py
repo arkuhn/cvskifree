@@ -7,7 +7,7 @@ from os.path import realpath, normpath
 from pynput.keyboard import Key, Controller
 from subprocess import Popen
 
-model = load_model('../classifier/model.h5')
+model = load_model('../classifier/1-78-model.h5')
 keyboard = Controller()
 
 cap = cv2.VideoCapture(0)
@@ -21,14 +21,20 @@ while 1:
     ret, img = cap.read() 
    
     cv2.putText(img,'CVSkiFree',(10,50), cv2.FONT_HERSHEY_SIMPLEX, 1,(255,255,255),2)
-
-    if counter % 5 == 0:
+    height, width, channels =  img.shape
+    y0 = int(height * .25)
+    y1 = height
+    left_x0 = 0
+    left_x1 = int(width / 3)
+    right_x0 =  width - int(width / 3)
+    right_x1 = width
+    if counter % 10 == 0:
         counter = 0
 
         height, width, channels =  img.shape
         #Crop out person and merge together hands
-        left = img[int(height * .25): height, 0 : int(width / 3)]
-        right = img[int(height * .25): height, width - int(width / 3) : width]
+        left = img[y0: y1, left_x0 : left_x1]
+        right = img[y0: y1, right_x0 : right_x1]
         hands = np.concatenate((left, right), axis=1)
 
         #Blur and threshold 
@@ -50,9 +56,12 @@ while 1:
             keyboard.press('a')
             keyboard.release('a')
      
-    
-
-    cv2.imshow('img',img) 
+    dst = img.copy()
+    dst = cv2.flip(img, 1);
+    height, width, channels =  dst.shape
+    cv2.rectangle(dst, (left_x0, y0), (left_x1, y1),  (255,0,0), 2)
+    cv2.rectangle(dst, (right_x0, y0), (right_x1, y1),  (255,0,0), 2)
+    cv2.imshow('img', dst) 
     k = cv2.waitKey(30) & 0xff
     if k == 27: 
         break
