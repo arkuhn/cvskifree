@@ -2,9 +2,12 @@ import sys, pygame
 from player import Player
 from wall import Wall
 from entity import Entity
-pygame.init()
 from pygame.locals import *
 
+
+
+
+pygame.init()
 size = width, height = 650, 490
 speed = [2, 2]
 black = 0, 0, 0
@@ -16,7 +19,7 @@ myfont = pygame.font.SysFont("monospace", 16)
 
 wall_list = pygame.sprite.Group()
 entity_list = pygame.sprite.Group()
- 
+
 wall = Wall(0, 0, 10, 490)
 wall_list.add(wall)
 
@@ -33,6 +36,9 @@ wall_list.add(wall)
 player = Player(325, 245, wall_list)
 
 score = 0
+dist = 10
+start = False
+start_ticks=pygame.time.get_ticks()
 
 
 def addMoreEntities():
@@ -45,14 +51,12 @@ def addMoreEntities():
 def increaseDifficulty():
     pass
 
-dist = 20
-start = False
-start_ticks=pygame.time.get_ticks()
+
 while 1:
     if not start:
         seconds=(pygame.time.get_ticks()-start_ticks)/1000 #calculate how many seconds
-        if int(seconds) < 6:
-            counter = myfont.render("Starting in: " + str(5 - int(seconds)), 1, (0,0,0))
+        if int(seconds) < 9:
+            counter = myfont.render("Starting in: " + str(10 - int(seconds)), 1, (0,0,0))
             screen.blit(counter, (320, 240))
         else:
             start = True
