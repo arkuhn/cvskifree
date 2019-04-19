@@ -6,12 +6,15 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint
 from skimage import exposure
 import numpy as np
+
+
 #CONFIG=======
-gesture = 'left' #gesture either left or right
 batch_size= 14
-image_width = 120
-image_height = 320
+image_width = 320
+image_height = 240
 #=============
+
+
 checkpoint = ModelCheckpoint('./model.h5', monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
@@ -60,18 +63,18 @@ val_datagen = ImageDataGenerator(
 train_generator = train_datagen.flow_from_directory(
     train_data_dir,
     target_size=(image_width, image_height),
-    color_mode='grayscale',
     batch_size=batch_size,
+    color_mode='grayscale',
     shuffle=True,
     class_mode='binary'
 )
 val_generator = val_datagen.flow_from_directory(
     val_data_dir,
     target_size=(image_width, image_height),
-    color_mode='grayscale',
     batch_size=batch_size,
+    color_mode='grayscale',
     shuffle=True,
-    class_mode='binary',
+    class_mode='binary'
 )
 
 model.fit_generator(
