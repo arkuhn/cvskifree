@@ -6,14 +6,11 @@ import cv2
 from os.path import realpath, normpath
 from pynput.keyboard import Key, Controller
 
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FPS, 30)
-
-
+model = load_model('../classifier/model.h5')
 keyboard = Controller()
 
-model = load_model('../classifier/model.h5')
-
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FPS, 30)
 
 
 counter = 0
@@ -30,7 +27,6 @@ while 1:
         np_image = transform.resize(np_image, (320, 240, 1))
         np_image = np.expand_dims(np_image, axis=0)
         result = model.predict(np_image)
-        print(str(result[0][0]))
         if result[0][0] >= 0.5:
             print('left')
             keyboard.press('a')
