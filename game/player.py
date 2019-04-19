@@ -12,20 +12,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = y
         self.walls = walllist
 
-    def handle_keys(self):
-        """ Handles Keys """
-        if self.state == 'dead':
-            return
-        key = pygame.key.get_pressed()
-        dist = 1 # distance moved in 1 frame, try changing it to 5
-        if key[pygame.K_DOWN]: # down key
-            self.rect.y += dist # move down
-        if key[pygame.K_UP]: # up key
-            self.rect.y -= dist # move up
-        if key[pygame.K_RIGHT]: # right key
-            self.rect.x += dist # move right
-        if key[pygame.K_LEFT]: # left key
-            self.rect.x -= dist # move left
 
 
     def draw(self, screen):
@@ -35,6 +21,14 @@ class Player(pygame.sprite.Sprite):
         # Did this update cause us to hit a wall?
         block_hit_list =  pygame.sprite.spritecollide(self, self.walls, False)
         if block_hit_list and self.state == 'alive':
+            self.state = 'dead'
+            self.image = pygame.image.load('../assets/hit.png')
+            print('hit')
+
+
+    def check_collision(self, entities):
+        gets_hit = pygame.sprite.spritecollide(self, entities, True)
+        if gets_hit:
             self.state = 'dead'
             self.image = pygame.image.load('../assets/hit.png')
             print('hit')
